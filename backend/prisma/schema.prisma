@@ -1,0 +1,180 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Account {
+  id        String   @id @default(uuid()) // Using UUID for a standard GUID
+  email     String   @unique
+  password  String
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  contact   Contact?
+}
+
+model Contact {
+  id        String   @id @default(uuid()) // Assuming UUID for a unique identifier
+  firstName String
+  lastName  String
+  email     String   @unique
+  phone     String
+  noReg     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  picture   String   @default("/default.png")
+  account   Account  @relation(fields: [id], references: [id])
+}
+
+model Assy {
+  id_assy             String   @id
+  state               String
+  NR_elbow_planning   Int
+  NR_elbow_actual     Int
+  NR_ball_planning    Int
+  NR_ball_actual      Int
+  NR_hev_planning     Int
+  NR_hev_actual       Int
+  NR_2_elbow_planning Int
+  NR_2_elbow_actual   Int
+  NR_2_ball_planning  Int
+  NR_2_ball_actual    Int
+  NR_2_hev_planning   Int
+  NR_2_hev_actual     Int
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model Casting {
+  id_casting          String   @id
+  state               String
+  LP_planning         Int
+  LP_actual           Int
+  DC_conv_planning    Int
+  DC_conv_actual      Int
+  DC_hev_planning     Int
+  DC_hev_actual       Int
+  CB_conv_planning    Int
+  CB_conv_actual      Int
+  CB_hev_planning     Int
+  CB_hev_actual       Int
+  CH_conv_planning    Int
+  CH_conv_actual      Int
+  CH_hev_planning     Int
+  CH_hev_actual       Int
+  CA_IN_conv_planning Int
+  CA_IN_conv_actual   Int
+  CA_IN_hev_planning  Int
+  CA_IN_hev_actual    Int
+  CA_EX_conv_planning Int
+  CA_EX_conv_actual   Int
+  CA_EX_hev_planning  Int
+  CA_EX_hev_actual    Int
+  CR_1NR_planning     Int
+  CR_1NR_actual       Int
+  CR_2NR_planning     Int
+  CR_2NR_actual       Int
+  elbow_1NR_planning  Int
+  elbow_1NR_actual    Int
+  ball_1NR_planning   Int
+  ball_1NR_actual     Int
+  hev_1NR_planning    Int
+  hev_1NR_actual      Int
+  elbow_2NR_planning  Int
+  elbow_2NR_actual    Int
+  ball_2NR_planning   Int
+  ball_2NR_actual     Int
+  hev_2NR_planning    Int
+  hev_2NR_actual      Int
+  planning_1NR        Int
+  actual_1NR          Int
+  planning_2NR        Int
+  actual_2NR          Int
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model Machining {
+  id_machining        String   @id
+  state               String
+  CB_conv_planning    Int
+  CB_conv_actual      Int
+  CB_hev_planning     Int
+  CB_hev_actual       Int
+  CH_conv_planning    Int
+  CH_conv_actual      Int
+  CH_hev_planning     Int
+  CH_hev_actual       Int
+  CA_IN_conv_planning Int
+  CA_IN_conv_actual   Int
+  CA_IN_hev_planning  Int
+  CA_IN_hev_actual    Int
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+//CONTROL BOARD
+
+model ControlAssy {
+  id_controlAssy String   @id
+  state          String
+  planning       Int
+  actual         Int
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model ControlMachining {
+  id_controlMachining     String   @id
+  state                   String
+  cylblock_planning       Int
+  cylblock_actual         Int
+  cylhead_planning        Int
+  cylhead_actual          Int
+  crankshaft_1nr_planning Int
+  crankshaft_1nr_actual   Int
+  crankshaft_2nr_planning Int
+  crankshaft_2nr_actual   Int
+  camshaft_conv_planning  Int
+  camshaft_conv_actual_in Int
+  camshaft_conv_actual_ex Int
+  camshaft_conv_bal_in    Int @default(0)
+  camshaft_conv_bal_ex    Int @default(0)
+  camshaft_hv_planning    Int
+  camshaft_hv_actual_in   Int
+  camshaft_hv_actual_ex   Int
+  camshaft_hv_bal_in      Int @default(0)
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
+
+model ControlCasting {
+  id_controlCasting String   @id
+  state             String
+  cast_dc_planning  Int
+  cast_dc_actual    Int
+  cast_lp_planning  Int
+  cast_lp_actual    Int
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model TimeSet {
+  id_timeSet  Int      @id @default(autoincrement())
+  datenow     DateTime @default(now())
+  state       String   @db.VarChar(255)
+  triggerDS   Int // Time as seconds since midnight (e.g., 06:00:00 is 21600)
+  triggerNS   Int // Time as seconds since midnight (e.g., 19:00:00 is 68400)
+  generatedId String   @db.VarChar(255)
+}
