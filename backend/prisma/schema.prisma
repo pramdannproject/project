@@ -35,7 +35,3 @@ model Contact {
   picture   String   @default("/default.png")
   account   Account  @relation(fields: [id], references: [id])
 }
-
- enum roleUser {
-  
- }
