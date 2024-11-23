@@ -9,18 +9,21 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Account {
   id        String   @id @default(uuid()) // Using UUID for a standard GUID
   email     String   @unique
   password  String
-  role      String   @default("user")
+  role      Role     @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   contact   Contact?
+
+  notification notification[]
+  sessions     Session[]
 }
 
 model Contact {
@@ -34,4 +37,62 @@ model Contact {
   updatedAt DateTime @updatedAt
   picture   String   @default("/default.png")
   account   Account  @relation(fields: [id], references: [id])
+}
+
+model Session {
+  id        String     @id @default(uuid())
+  token     String     @unique
+  accountId String
+  expiredAt DateTime
+  device    DeviceList @default(MOBILE)
+  account   Account    @relation(fields: [accountId], references: [id])
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model notification {
+  id        String           @id @default(uuid())
+  title     String
+  message   String
+  type      TypeNotification @default(BASIC)
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  accountId String
+  account   Account          @relation(fields: [accountId], references: [id])
+}
+
+model FileNode {
+  id        String     @id @default(uuid()) // ID file atau folder
+  name      String // Nama file atau folder
+  type      FileType // Tipe, apakah ini file atau folder
+  path      String // Path lengkap file atau folder
+  parentId  String? // ID parent untuk membentuk hierarki
+  parent    FileNode?  @relation("ParentChild", fields: [parentId], references: [id])
+  children  FileNode[] @relation("ParentChild")
+  createdAt DateTime   @default(now()) // Tanggal file/folder dibuat
+  updatedAt DateTime   @updatedAt // Tanggal file/folder terakhir diperbarui
+}
+
+enum FileType {
+  FILE
+  FOLDER
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum DeviceList {
+  MOBILE
+  TABLET
+  DESKTOP
+  UNKNOWN
+}
+
+enum TypeNotification {
+  BASIC
+  INFO
+  WARNING
 }

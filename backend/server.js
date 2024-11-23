@@ -29,6 +29,10 @@ const internalDataControl = require("./controllers/internal/control/data");
 const filesAssets = require("./controllers/files/assets");
 const filesProfile = require("./controllers/files/profile");
 
+const fileManager = require("./controllers/files/filemanager");
+const fileTree = require("./controllers/files/fileTree");
+
+
 // Load Functions
 const sendData = require("./functions/sendData");
 
@@ -70,6 +74,8 @@ app.use("/api/internal", internalDataControl);
 //===============[File Routes]=================//
 app.use("/files", filesAssets);
 app.use("/files", filesProfile);
+app.use("/manage", fileManager);
+app.use("/manage", fileTree);
 
 //handler if route not found
 app.use((req, res) => {
