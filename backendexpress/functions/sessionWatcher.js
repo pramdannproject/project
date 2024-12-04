@@ -44,7 +44,7 @@ async function sessionWatcher(idSession) {
     return false;
   } catch (error) {
     console.error("Error in sessionWatcher:", error.message);
-    throw error;
+    return false;
   }
 }
 

@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 const router = express.Router();
 
 // Path untuk direktori files yang benar
-const filesDir = path.resolve(__dirname, "../..", "gentaniboardfiles"); // Resolusi path absolut ke ../files
+const filesDir = path.resolve(__dirname, "../..", "glmanagementboardfiles"); // Resolusi path absolut ke ../files
 
 // Set up multer storage dengan pemeriksaan duplikasi nama file
 const storage = multer.diskStorage({
@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
 
       // Jika parentId ada, cari folder terkait di database
       if (parentId) {
-        const parentFolder = await prisma.fileNodeGentaniBoard.findUnique({
+        const parentFolder = await prisma.fileNodeGLManagementBoard.findUnique({
           where: { id: parentId },
         });
 
@@ -57,11 +57,11 @@ const storage = multer.diskStorage({
 
       // Fungsi untuk memeriksa apakah file dengan nama tertentu sudah ada
       const fileExists = async (name) => {
-        const existing = await prisma.fileNodeGentaniBoard.findFirst({
+        const existing = await prisma.fileNodeGLManagementBoard.findFirst({
           where: {
             parentId: parentId || null,
             name: name,
-            type: 'FILE',
+            type: "FILE",
           },
         });
         return !!existing;
@@ -91,17 +91,17 @@ const upload = multer({
 });
 
 // Route untuk mendapatkan file berdasarkan parentId
-router.get("/gentani/files", async (req, res) => {
+router.get("/glm/files", async (req, res) => {
   const { parentId } = req.query;
 
   try {
-    const files = await prisma.fileNodeGentaniBoard.findMany({
+    const files = await prisma.fileNodeGLManagementBoard.findMany({
       where: {
         parentId: parentId || null,
       },
       orderBy: [
-        { type: 'asc' }, // Folder sebelum file
-        { name: 'asc' }, // Urut berdasarkan nama
+        { type: "asc" }, // Folder sebelum file
+        { name: "asc" }, // Urut berdasarkan nama
       ],
     });
     res.status(200).json(files);
@@ -113,7 +113,7 @@ router.get("/gentani/files", async (req, res) => {
 
 // Route untuk upload file
 // Pastikan untuk menambahkan parentId sebagai query parameter, misalnya: /files?parentId=xyz
-router.post("/gentani/files", upload.single("file"), async (req, res) => {
+router.post("/glm/files", upload.single("file"), async (req, res) => {
   const { file } = req;
   const parentId = req.query.parentId; // Ambil parentId dari query parameter
 
@@ -123,7 +123,7 @@ router.post("/gentani/files", upload.single("file"), async (req, res) => {
 
   try {
     // Dapatkan informasi folder parent dari database berdasarkan parentId
-    const parentFolder = await prisma.fileNodeGentaniBoard.findUnique({
+    const parentFolder = await prisma.fileNodeGLManagementBoard.findUnique({
       where: { id: parentId },
     });
 
@@ -135,18 +135,19 @@ router.post("/gentani/files", upload.single("file"), async (req, res) => {
     const filePath = path.join(parentFolder.path, file.filename); // Gunakan file.filename yang unik
 
     // Simpan data file ke database
-    const fileNodeGentaniBoard = await prisma.fileNodeGentaniBoard.create({
-      data: {
-        name: file.filename, // Gunakan nama unik
-        type: "FILE",
-        path: filePath,
-        parentId: parentId || null,
-      },
-    });
+    const fileNodeGLManagementBoard =
+      await prisma.fileNodeGLManagementBoard.create({
+        data: {
+          name: file.filename, // Gunakan nama unik
+          type: "FILE",
+          path: filePath,
+          parentId: parentId || null,
+        },
+      });
 
     res.status(200).json({
       message: "File uploaded and metadata stored successfully",
-      file: fileNodeGentaniBoard,
+      file: fileNodeGLManagementBoard,
     });
   } catch (error) {
     console.error("Error storing file metadata:", error);
@@ -155,23 +156,24 @@ router.post("/gentani/files", upload.single("file"), async (req, res) => {
 });
 
 // Route untuk menghapus file atau folder
-router.delete("/gentani/files/:id", async (req, res) => {
+router.delete("/glm/files/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
     // Dapatkan metadata file/folder dari database
-    const fileNodeGentaniBoard = await prisma.fileNodeGentaniBoard.findUnique({
-      where: { id: id },
-    });
+    const fileNodeGLManagementBoard =
+      await prisma.fileNodeGLManagementBoard.findUnique({
+        where: { id: id },
+      });
 
-    if (!fileNodeGentaniBoard) {
+    if (!fileNodeGLManagementBoard) {
       return res.status(404).json({ error: "File/Folder not found" });
     }
 
     // Jika ini adalah file, kita hapus file fisiknya
-    if (fileNodeGentaniBoard.type === "FILE") {
+    if (fileNodeGLManagementBoard.type === "FILE") {
       // Menghapus file fisik
-      const filePath = fileNodeGentaniBoard.path;
+      const filePath = fileNodeGLManagementBoard.path;
       fs.unlink(filePath, async (err) => {
         if (err) {
           console.error("Error deleting file:", err);
@@ -179,7 +181,7 @@ router.delete("/gentani/files/:id", async (req, res) => {
         }
 
         // Setelah file dihapus, hapus metadata file dari database
-        await prisma.fileNodeGentaniBoard.delete({
+        await prisma.fileNodeGLManagementBoard.delete({
           where: { id: id },
         });
 
@@ -187,7 +189,7 @@ router.delete("/gentani/files/:id", async (req, res) => {
       });
     }
     // Jika ini adalah folder, kita hapus folder beserta isinya
-    else if (fileNodeGentaniBoard.type === "FOLDER") {
+    else if (fileNodeGLManagementBoard.type === "FOLDER") {
       // Menghapus isi folder terlebih dahulu
       const deleteFolderRecursively = async (folderPath) => {
         // Ambil semua file/folder dalam folder ini
@@ -211,10 +213,10 @@ router.delete("/gentani/files/:id", async (req, res) => {
       };
 
       // Menghapus folder beserta isinya
-      await deleteFolderRecursively(fileNodeGentaniBoard.path);
+      await deleteFolderRecursively(fileNodeGLManagementBoard.path);
 
       // Hapus metadata folder dari database
-      await prisma.fileNodeGentaniBoard.delete({
+      await prisma.fileNodeGLManagementBoard.delete({
         where: { id: id },
       });
 
@@ -229,12 +231,12 @@ router.delete("/gentani/files/:id", async (req, res) => {
 });
 
 // Route untuk membuat folder baru
-router.post("/gentani/folders", async (req, res) => {
+router.post("/glm/folders", async (req, res) => {
   const { name, parentId } = req.body;
 
   try {
     // Cek apakah folder dengan nama yang sama sudah ada di database
-    const existingFolder = await prisma.fileNodeGentaniBoard.findFirst({
+    const existingFolder = await prisma.fileNodeGLManagementBoard.findFirst({
       where: {
         name: name,
         parentId: parentId || null,
@@ -248,7 +250,7 @@ router.post("/gentani/folders", async (req, res) => {
 
     // Dapatkan folder parent dari database berdasarkan parentId
     const parentFolder = parentId
-      ? await prisma.fileNodeGentaniBoard.findUnique({
+      ? await prisma.fileNodeGLManagementBoard.findUnique({
           where: { id: parentId },
         })
       : null;
@@ -264,7 +266,7 @@ router.post("/gentani/folders", async (req, res) => {
     }
 
     // Simpan data folder ke database
-    const folderNode = await prisma.fileNodeGentaniBoard.create({
+    const folderNode = await prisma.fileNodeGLManagementBoard.create({
       data: {
         name,
         type: "FOLDER",
@@ -283,52 +285,119 @@ router.post("/gentani/folders", async (req, res) => {
   }
 });
 
+//Route untuk menambahkan file thumbnail folder
+router.put(
+  "/glm/folders/thumb/:id",
+  upload.single("file"),
+  async (req, res) => {
+    const { id } = req.params;
+    const { file } = req;
+
+    if (!file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    try {
+      // Dapatkan metadata folder dari database
+      const folderNode = await prisma.fileNodeGLManagementBoard.findUnique({
+        where: { id: id },
+      });
+
+      if (!folderNode || folderNode.type !== "FOLDER") {
+        return res.status(404).json({ error: "Folder not found" });
+      }
+
+      //folder tidak boleh memiliki parent
+      if (folderNode.parentId) {
+        return res.status(400).json({ error: "Folder cannot have parent" });
+      }
+
+      // Path file thumbnail berdasarkan folder id
+      const thumbPath = `${file.filename}`; // Gunakan file.filename yang unik
+
+      // Simpan data file thumbnail ke database
+      const thumbNode = await prisma.fileNodeGLManagementBoard.update({
+        where: { id: id },
+        data: {
+          pathThumb: thumbPath,
+        },
+      });
+
+      res.status(200).json({
+        message: "Thumbnail uploaded and metadata stored successfully",
+        thumb: thumbNode,
+      });
+    } catch (error) {
+      console.error("Error storing thumbnail metadata:", error);
+      res.status(500).json({ error: "Error storing thumbnail metadata" });
+    }
+  }
+);
+
+router.get("/glm/folders/thumb/:name", async (req, res) => {
+  const name = req.params.name;
+
+  const filePath = `./glmanagementboard/${name}`;
+  if (fs.existsSync(filePath)) {
+    res.sendFile(path.resolve(filePath));
+  } else {
+    res.sendFile(path.resolve("./img/nofound.jpg"));
+  }
+});
+
 // Route untuk mengedit nama file atau folder
-router.put("/gentani/files/:id", async (req, res) => {
+router.put("/glm/files/:id", async (req, res) => {
   const { id } = req.params;
   const { newName } = req.body;
 
   // Validasi input
-  if (!newName || typeof newName !== 'string' || newName.trim() === '') {
-    return res.status(400).json({ error: "New name is required and cannot be empty" });
+  if (!newName || typeof newName !== "string" || newName.trim() === "") {
+    return res
+      .status(400)
+      .json({ error: "New name is required and cannot be empty" });
   }
 
   try {
-    // Dapatkan fileNodeGentaniBoard yang akan diubah
-    const fileNodeGentaniBoard = await prisma.fileNodeGentaniBoard.findUnique({
-      where: { id: id },
-      include: { parent: true },
-    });
+    // Dapatkan fileNodeGLManagementBoard yang akan diubah
+    const fileNodeGLManagementBoard =
+      await prisma.fileNodeGLManagementBoard.findUnique({
+        where: { id: id },
+        include: { parent: true },
+      });
 
-    if (!fileNodeGentaniBoard) {
+    if (!fileNodeGLManagementBoard) {
       return res.status(404).json({ error: "File/Folder not found" });
     }
 
     // Cek apakah sudah ada file/folder dengan nama baru di parent yang sama
-    const existingNode = await prisma.fileNodeGentaniBoard.findFirst({
+    const existingNode = await prisma.fileNodeGLManagementBoard.findFirst({
       where: {
-        parentId: fileNodeGentaniBoard.parentId || null,
+        parentId: fileNodeGLManagementBoard.parentId || null,
         name: newName,
-        type: fileNodeGentaniBoard.type, // Pastikan tipe sama (FILE/FOLDER)
+        type: fileNodeGLManagementBoard.type, // Pastikan tipe sama (FILE/FOLDER)
       },
     });
 
     if (existingNode) {
-      return res.status(400).json({ error: `A ${fileNodeGentaniBoard.type.toLowerCase()} with the name '${newName}' already exists in this folder` });
+      return res.status(400).json({
+        error: `A ${fileNodeGLManagementBoard.type.toLowerCase()} with the name '${newName}' already exists in this folder`,
+      });
     }
 
     // Tentukan path baru
-    const parentPath = fileNodeGentaniBoard.parent ? fileNodeGentaniBoard.parent.path : filesDir;
+    const parentPath = fileNodeGLManagementBoard.parent
+      ? fileNodeGLManagementBoard.parent.path
+      : filesDir;
     const newPath = path.join(parentPath, newName);
 
     // Rename di filesystem
-    await fs.promises.rename(fileNodeGentaniBoard.path, newPath);
+    await fs.promises.rename(fileNodeGLManagementBoard.path, newPath);
 
     // Jika ini adalah folder, perbarui path semua child-nya
-    if (fileNodeGentaniBoard.type === "FOLDER") {
+    if (fileNodeGLManagementBoard.type === "FOLDER") {
       // Fungsi rekursif untuk mendapatkan semua descendant
       const getAllDescendants = async (parentId) => {
-        const children = await prisma.fileNodeGentaniBoard.findMany({
+        const children = await prisma.fileNodeGLManagementBoard.findMany({
           where: { parentId: parentId },
         });
 
@@ -343,14 +412,17 @@ router.put("/gentani/files/:id", async (req, res) => {
         return descendants;
       };
 
-      const descendants = await getAllDescendants(fileNodeGentaniBoard.id);
+      const descendants = await getAllDescendants(fileNodeGLManagementBoard.id);
 
       // Update path semua descendant
       const updatePromises = descendants.map(async (descendant) => {
         // Hitung relative path dari folder yang diubah
-        const relativePath = path.relative(fileNodeGentaniBoard.path, descendant.path);
+        const relativePath = path.relative(
+          fileNodeGLManagementBoard.path,
+          descendant.path
+        );
         const updatedPath = path.join(newPath, relativePath);
-        return prisma.fileNodeGentaniBoard.update({
+        return prisma.fileNodeGLManagementBoard.update({
           where: { id: descendant.id },
           data: { path: updatedPath },
         });
@@ -360,14 +432,15 @@ router.put("/gentani/files/:id", async (req, res) => {
     }
 
     // Update database dengan nama dan path baru
-    const updatedfileNodeGentaniBoard = await prisma.fileNodeGentaniBoard.update({
-      where: { id: id },
-      data: { name: newName, path: newPath },
-    });
+    const updatedfileNodeGLManagementBoard =
+      await prisma.fileNodeGLManagementBoard.update({
+        where: { id: id },
+        data: { name: newName, path: newPath },
+      });
 
     res.status(200).json({
       message: "File/Folder renamed successfully",
-      file: updatedfileNodeGentaniBoard,
+      file: updatedfileNodeGLManagementBoard,
     });
   } catch (error) {
     console.error("Error renaming file/folder:", error);

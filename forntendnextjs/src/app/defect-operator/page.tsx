@@ -1,24 +1,24 @@
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import DragMp from '@/components/MpDrag/DragMp';
 import { Metadata } from "next";
 import DefaultLayout from "@/components/Layouts/DefaultLaout";
 import Cookies from "js-cookie";
+import TableDefect from "@/components/defect-operator/defectop";
 
 export const metadata: Metadata = {
   title: "Next.js Tables Page | NextAdmin - Next.js Dashboard Kit",
   description: "This is Next.js Tables page for NextAdmin Dashboard Kit",
 };
 
-const Henkaten = () => {
+const DefectOp = () => {
   return (
     <DefaultLayout>
-      <Breadcrumb pageName="Henkaten" />
+      <Breadcrumb pageName="Defect Operator" />
 
       <div className="flex flex-col gap-10">
-        <DragMp />
+        <TableDefect />
       </div>
     </DefaultLayout>
   );
 };
 
-export default Henkaten;
+export default DefectOp;

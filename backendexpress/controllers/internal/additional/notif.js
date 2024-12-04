@@ -32,12 +32,8 @@ router.get("/type", async (req, res) => {
       return res.status(404).json({ error: "Account not found" });
     }
 
-    //get type from enum in prisma
-    const type = prisma.enumInfo.findMany({
-      where: {
-        enumName: "NotificationType",
-      },
-    });
+    //get all notification type from enum typenotififation
+    const type = ["BASIC", "INFO", "WARNING", "ERROR"];
 
     if (!type) {
       return res.status(404).json({ error: "Type not found" });

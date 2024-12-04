@@ -98,6 +98,7 @@ model FileNodeGLManagementBoard {
   name      String // Nama file atau folder
   type      FileType // Tipe, apakah ini file atau folder
   path      String // Path lengkap file atau folder
+  pathThumb String? // Path thumbnail file
   parentId  String? // ID parent untuk membentuk hierarki
   parent    FileNodeGLManagementBoard?  @relation("ParentChild", fields: [parentId], references: [id])
   children  FileNodeGLManagementBoard[] @relation("ParentChild")
@@ -115,6 +116,73 @@ model FileNodeGentaniBoard {
   children  FileNodeGentaniBoard[] @relation("ParentChild")
   createdAt DateTime               @default(now()) // Tanggal file/folder dibuat
   updatedAt DateTime               @updatedAt // Tanggal file/folder terakhir diperbarui
+}
+
+model manPowerImage {
+  id         String   @id @default(uuid())
+  name       String
+  noreg      String
+  shift      ShitType @default(WHITE)
+  path       String   @default("/default.png")
+  editedPath String   @default("/default.png")
+  x          Float    @default(0)
+  y          Float    @default(0)
+  xPercent   Float    @default(0)
+  yPercent   Float    @default(0)
+  isActive   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model historyManPowerImage {
+  id         String   @id @default(uuid())
+  name       String
+  noreg      String
+  shift      ShitType @default(WHITE)
+  path       String   @default("/default.png")
+  editedPath String   @default("/default.png")
+  x          Float    @default(0)
+  y          Float    @default(0)
+  xPercent   Float    @default(0)
+  yPercent   Float    @default(0)
+  isActive   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model defectOperatorParrent {
+  id        String                @id @default(uuid())
+  name      String
+  children  defectOperatorChild[] @relation("ParentChild")
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
+}
+
+model defectOperatorChild {
+  id         String                 @id @default(uuid())
+  no         String
+  line       String
+  process    String
+  defect     String
+  parentId   String?
+  parent     defectOperatorParrent? @relation("ParentChild", fields: [parentId], references: [id])
+  operatorId String? // Foreign key untuk operator
+  operator   operator?              @relation(fields: [operatorId], references: [id]) // Relasi ke model operator
+  createdAt  DateTime               @default(now())
+  updatedAt  DateTime               @updatedAt
+}
+
+model operator {
+  id        String   @id @default(uuid())
+  noReg     String   @unique
+  name      String
+  line      String
+  process   String
+  defect    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  defectOperatorChilds defectOperatorChild[] // Relasi satu ke banyak dari operator ke defectOperatorChild
 }
 
 enum FileType {
@@ -138,4 +206,10 @@ enum TypeNotification {
   BASIC
   INFO
   WARNING
+  ERROR
+}
+
+enum ShitType {
+  WHITE
+  RED
 }

@@ -1,5 +1,5 @@
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import DraggableContainer from '@/components/MpDrag/DraggableContainer';
+import GlmPage from '@/components/Glm/index';
 import { Metadata } from "next";
 import DefaultLayout from "@/components/Layouts/DefaultLaout";
 import Cookies from "js-cookie";
@@ -15,7 +15,7 @@ const GLMB = () => {
       <Breadcrumb pageName="GL Management Board" />
 
       <div className="flex flex-col gap-10">
-        <DraggableContainer />
+        <GlmPage />
       </div>
     </DefaultLayout>
   );

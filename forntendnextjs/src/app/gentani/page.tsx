@@ -1,5 +1,5 @@
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import DragMp from '@/components/MpDrag/DragMp';
+import GentaniPage from '@/components/Gentani/index';
 import { Metadata } from "next";
 import DefaultLayout from "@/components/Layouts/DefaultLaout";
 import Cookies from "js-cookie";
@@ -9,16 +9,16 @@ export const metadata: Metadata = {
   description: "This is Next.js Tables page for NextAdmin Dashboard Kit",
 };
 
-const Henkaten = () => {
+const Gentani = () => {
   return (
     <DefaultLayout>
-      <Breadcrumb pageName="Henkaten" />
+      <Breadcrumb pageName="Gentani Board" />
 
       <div className="flex flex-col gap-10">
-        <DragMp />
+        <GentaniPage />
       </div>
     </DefaultLayout>
   );
 };
 
-export default Henkaten;
+export default Gentani;

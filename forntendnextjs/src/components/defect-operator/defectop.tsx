@@ -1,4 +1,4 @@
-// components/TableAccount.tsx
+// components/TableDefect.tsx
 "use client"; // Menandai komponen sebagai Client Component
 
 import React, { useEffect, useState, ChangeEvent, FormEvent } from "react";
@@ -51,8 +51,8 @@ interface Account {
   sessions: Session[];
 }
 
-// Props yang dibutuhkan oleh komponen TableAccount
-const TableAccount: React.FC = () => {
+// Props yang dibutuhkan oleh komponen TableDefect
+const TableDefect: React.FC = () => {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -1244,4 +1244,4 @@ const TableAccount: React.FC = () => {
   );
 };
 
-export default TableAccount;
+export default TableDefect;

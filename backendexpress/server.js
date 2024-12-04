@@ -24,11 +24,21 @@ const filemanager = require("./controllers/files/filemanager");
 const filetree = require("./controllers/files/filetree");
 const filemanagersga = require("./controllers/files/filemanagersga");
 const filetreesga = require("./controllers/files/fileTreeSga");
+const filemanagergentaniboard = require("./controllers/files/filemanagergentaniboard");
+const filetreegentaniboard = require("./controllers/files/filetreegentaniboard");
+const notification = require("./controllers/internal/additional/notif");
+const managemp = require("./controllers/henkatenboard/manage");
+const mpimage = require("./controllers/henkatenboard/mpImage");
+const filemanagerglm = require("./controllers/glmanagement/filemanagerglm");
+const filetreeglm = require("./controllers/glmanagement/fileTreeGlm");
+const managedefectop = require("./controllers/defectop/manage");
 
 // Load WebSocket handlers
 const handleDataAccountsSocket = require("./sockets/dataAccounts");
 const handleDataSessionId = require("./sockets/dataSessionId");
 const handleDataSessionAccount = require("./sockets/dataSessionAccount");
+const handleDataHenkaten = require("./sockets/sendHenkaten");
+const handleDataDefectOp = require("./sockets/dataDefectOp");
 
 //-----------------Configuration------------------//
 app.use(bodyParser.json());
@@ -54,15 +64,29 @@ app.use("/api/users", userEdit);
 app.use("/api/users", userAccount);
 
 //===============[Internal Routes]=================//
+app.use("/api/internal", notification);
 
 //===============[File Routes]=================//
 app.use("/files", filesAssets);
 app.use("/files", filesProfile);
+app.use("/files", mpimage);
 
 app.use("/api/manage", filemanager);
 app.use("/api/manage", filetree);
 app.use("/api/manage", filemanagersga);
 app.use("/api/manage", filetreesga);
+app.use("/api/manage", filemanagergentaniboard);
+app.use("/api/manage", filetreegentaniboard);
+
+//===============[glmanagement Routes]=================//
+app.use("/api/manage", filemanagerglm);
+app.use("/api/manage", filetreeglm);
+
+//===============[Defect Operator Routes]=================//
+app.use("/api/manage", managedefectop);
+
+//===============[Henkatenboard Routes]=================//
+app.use("/api/manage/henkaten", managemp);
 
 //handler if route not found
 app.use((req, res) => {
@@ -81,6 +105,10 @@ wss.on("connection", (ws, req) => {
     handleDataSessionId(ws, req);
   } else if (req.url.startsWith("/dataSessionAccount")) {
     handleDataSessionAccount(ws, req);
+  } else if (req.url.startsWith("/dataHenkaten")) {
+    handleDataHenkaten(ws, req);
+  } else if (req.url.startsWith("/dataDefectOp")) {
+    handleDataDefectOp(ws, req);
   } else {
     ws.send(JSON.stringify({ error: "Invalid request URL" }));
     ws.close();
