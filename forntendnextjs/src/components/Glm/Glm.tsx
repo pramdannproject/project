@@ -790,7 +790,7 @@ const GlmBoard = () => {
       {loading ? (
   <p>Loading...</p>
 ) : (
-  <ul className="grid grid-cols-2 gap-4 md:grid-cols-4">
+  <ul className="grid grid-cols-2 gap-4 md:grid-cols-3">
     {files.map((item) => (
       <li
         key={item.id}
@@ -805,8 +805,8 @@ const GlmBoard = () => {
               <Image
                 src={item.pathThumb}
                 alt={item.name}
-                width={64}
-                height={64}
+                width={256}
+                height={256}
                 className="object-cover rounded-md"
               />
             ) : (
