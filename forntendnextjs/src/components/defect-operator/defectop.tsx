@@ -1137,13 +1137,19 @@ const TableDefect: React.FC = () => {
             <thead>
               <tr className="bg-[#F7F9FC] text-left dark:bg-dark-2">
                 <th className="min-w-[220px] px-4 py-4 font-medium text-dark dark:text-white xl:pl-7.5">
-                  Profile
+                  No
                 </th>
                 <th className="min-w-[150px] px-4 py-4 font-medium text-dark dark:text-white">
-                  Name
+                  Line
                 </th>
                 <th className="min-w-[120px] px-4 py-4 font-medium text-dark dark:text-white">
-                  Roles
+                  Process
+                </th>
+                <th className="px-4 py-4 text-right font-medium text-dark dark:text-white xl:pr-7.5">
+                  Operator
+                </th>
+                <th className="px-4 py-4 text-right font-medium text-dark dark:text-white xl:pr-7.5">
+                  Defect
                 </th>
                 <th className="px-4 py-4 text-right font-medium text-dark dark:text-white xl:pr-7.5">
                   Actions

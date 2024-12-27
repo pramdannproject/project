@@ -8,6 +8,10 @@ const prisma = new PrismaClient();
 router.post("/parent", async (req, res) => {
   const { name } = req.body;
 
+  if(!name) {
+    return res.status(400).json({ error: "Please fill all required fields" });
+  }
+
   try {
     const parent = await prisma.defectOperatorParrent.create({
       data: { name },
